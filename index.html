@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Editable Table</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+    
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    
+    <script type="text/babel">
+        // if  we want a large amount of data then we can store data in an object array pass it in use state.
+        function EditableTable() {
+            const [data, setData] = React.useState([
+                { id: 1, tech:'onboarding call',name: 'candidate1', email: 'c1@example.com', profession: 'Engineer' },
+                { id: 2, tech:'google search console',name: 'candidate2', email: 'c2@example.com', profession: 'Designer' },
+                { id: 3, tech:'google anlytics access',name: 'candidate1', email: 'c1@example.com', profession: 'Engineer' },
+                { id: 4, tech:'website access',name: 'candidate2', email: 'c2@example.com', profession: 'Designer' },
+                { id: 5, tech:'technical audit',name: 'candidate1', email: 'c1@example.com', profession: 'Engineer' },
+                { id: 6, tech:'Anchor tag and symantic analysis',name: 'candidate2', email: 'c2@example.com', profession: 'Designer' },
+            ]);
+
+            const handleChange = (e, index, key) => {
+                const newData = [...data];
+                newData[index][key] = e.target.value;
+                setData(newData);
+            };
+
+            const handleSave = () => {
+                console.log('Data ready to post:', data);
+                
+                const apiUrl = 'http://localhost:5000/save'; 
+
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(result => {
+                    console.log('Success:', result);
+                    alert('Data saved successfully!');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // alert('Failed to save data.');
+                })
+            };
+
+            return (
+                <div>
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th colSpan="5" style={{textAlign:"left"}}>Month 1</th>
+                              
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data.map((row, index) => (
+                                
+                                <tr key={row.id}>
+                                    <td >{row.id}</td>
+                                    <td id="tech">
+                                        <input
+                                            type="text"
+                                            value={row.tech}
+                                            onChange={(e) =>{ handleChange(e, index, 'tech')}}
+                                            
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={row.name}
+                                            onChange={(e) => { handleChange(e, index, 'name')}}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="email"
+                                            value={row.email}
+                                            onChange={(e) => handleChange(e, index, 'email')}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={row.profession}
+                                            onChange={(e) => handleChange(e, index, 'profession')}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <button onClick={handleSave}>Save</button>
+                </div>
+            );
+        }
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<EditableTable />);
+    </script>
+</body>
+</html>
